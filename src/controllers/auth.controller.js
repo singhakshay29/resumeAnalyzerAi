@@ -1,5 +1,7 @@
 const userModal = require("../models/user.model");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
+const tokenblacklistModal = require("../models/blacklist.model");
 async function registerUserController(req, res) {
   const { userName, email, password } = req.body;
   if (!userName || !email || !password) {
@@ -69,4 +71,32 @@ async function loginUserController(req, res) {
   });
 }
 
-module.exports = { registerUserController,loginUserController };
+async function logoutUserController(req, res) {
+  const { token } = req.cookies;
+  if (token) {
+    await tokenblacklistModal.create({ token });
+  }
+  res.clearCookie("token");
+  res.status(200).json({
+    message: "User Logged out Successfully",
+  });
+}
+
+async function getUserInfoController(req, res) {
+  const user = await userModal.findById(req.user.id);
+  res.status(200).json({
+    message: "user info fetched successfully",
+    user: {
+      id: user._id,
+      userName: user.userName,
+      email: user.email,
+    },
+  });
+}
+
+module.exports = {
+  registerUserController,
+  loginUserController,
+  logoutUserController,
+  getUserInfoController,
+};
