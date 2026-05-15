@@ -40,7 +40,7 @@ export async function logoutUser() {
 
 export async function getCurrentUser() {
   try {
-    const response = await api.get("/api/auth/getuserInfo");
+    const response = await api.get("/getuserInfo");
     return response.data;
   } catch (error) {
     console.log("Error fetching current user:", error);
