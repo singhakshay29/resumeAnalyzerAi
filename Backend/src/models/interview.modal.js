@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const technicalQuestionsSchema = new mongoose.Schema(
   {
     question: { type: String, required: [true, "Question is required"] },
-    intension: { type: String, required: [true, "Intension is required"] },
+    intention: { type: String, required: [true, "intention is required"] },
     answer: { type: String, required: [true, "Answer is required"] },
   },
   { _id: false }
@@ -12,7 +12,7 @@ const technicalQuestionsSchema = new mongoose.Schema(
 const behaviourQuestionsSchema = new mongoose.Schema(
   {
     question: { type: String, required: [true, "Question is required"] },
-    intension: { type: String, required: [true, "Intension is required"] },
+    intention: { type: String, required: [true, "intention is required"] },
     answer: { type: String, required: [true, "Answer is required"] },
   },
   { _id: false }
@@ -51,7 +51,7 @@ const interviewSchema = new mongoose.Schema(
     technicalQuestions: [technicalQuestionsSchema],
     behaviourQuestions: [behaviourQuestionsSchema],
     skillGaps: [skillgapSchema],
-    preparationPlanSchema: [preparationPlanSchema],
+    preparationPlan: [preparationPlanSchema],
     user:{type:mongoose.Schema.Types.ObjectId,ref:"users",required:true}
   },
   { timestamps: true }
