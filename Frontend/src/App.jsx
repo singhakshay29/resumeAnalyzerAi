@@ -1,14 +1,19 @@
-import {RouterProvider} from "react-router-dom";
+import { RouterProvider } from "react-router-dom";
 import "./style.scss";
 import routes from "./routes";
-import {AuthProvider} from "./feature/auth/auth.context";
+import { AuthProvider } from "./feature/auth/auth.context";
+import { InterviewProvider } from "./feature/ai/interview.context";
 
 function App() {
-  return <>
-  <AuthProvider>
-  <RouterProvider router={routes} />
-  </AuthProvider>
- </>;
+  return (
+    <>
+      <AuthProvider>
+        <InterviewProvider>
+          <RouterProvider router={routes} />
+        </InterviewProvider>
+      </AuthProvider>
+    </>
+  );
 }
 
 export default App;

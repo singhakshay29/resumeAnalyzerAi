@@ -52,7 +52,12 @@ const interviewSchema = new mongoose.Schema(
     behaviourQuestions: [behaviourQuestionsSchema],
     skillGaps: [skillgapSchema],
     preparationPlan: [preparationPlanSchema],
-    user:{type:mongoose.Schema.Types.ObjectId,ref:"users",required:true}
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "users",
+      required: true,
+    },
+    title: { type: String, required: [true, "Title is required"] },
   },
   { timestamps: true }
 );

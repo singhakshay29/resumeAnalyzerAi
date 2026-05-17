@@ -55,6 +55,7 @@ const interviewReportSchema = z.object({
   skillGaps: z.array(skillGapSchema),
 
   preparationPlanSchema: z.array(preparationPlanSchema),
+  title: z.string().describe("Title of the job for which the interview report is generated"),
 });
 
 async function generateInterviewReport({
