@@ -4,7 +4,7 @@ const interviewReportModal = require('../models/interview.modal');
 
 async function generateInterviewReportController(req,res){
     
-    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req.file.buffer))).getText()
+    const resumeContent = await (new pdfParse.PDFParse(Uint8Array.from(req?.file.buffer))).getText()
     const {selfDescription,jobDescription}=req.body;
     
     try {

@@ -13,21 +13,24 @@ export const useInterview = () => {
   if (!context) {
     throw new Error("useInterview must be used within InterviewProvider");
   }
-  const generateReport = async ({
+  const generateReport = async (
     resumeFile,
     selfDescription,
     jobDescription,
-  }) => {
+  ) => {
+    let response = null;
     setLoading(true);
     try {
-      const response = await generateInterviewReport({
+      response = await generateInterviewReport({
         resumeFile,
         selfDescription,
         jobDescription,
       });
-      setReport(response.interviewReport);
+       setReport(response?.data);
+      return response?.data;
     } catch (error) {
       console.log("Error generating interview report:", error);
+      return response;
     } finally {
       setLoading(false);
     }
@@ -35,11 +38,14 @@ export const useInterview = () => {
 
   const genrateReportById = async (id) => {
     setLoading(true);
+    let response = null;
     try {
-      const response = await getInterviewReportById(id);
-      setReport(response.interviewReport);
+      response = await getInterviewReportById(id);
+      setReport(response?.data);
+      return response?.data;
     } catch (error) {
       console.log("Error fetching interview report:", error);
+      return response;
     } finally {
       setLoading(false);
     }
@@ -47,14 +53,16 @@ export const useInterview = () => {
 
   const genrateReports = async () => {
     setLoading(true);
+    let response = null;
     try {
-      const response = await getAllInterviewReportsByUser();
+      response = await getAllInterviewReportsByUser();
       setReports(response.interviewReports);
     } catch (error) {
       console.log("Error fetching interview reports:", error);
     } finally {
       setLoading(false);
     }
+    return response.interviewReports;
   };
 
   return {

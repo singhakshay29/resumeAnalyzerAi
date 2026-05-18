@@ -1,7 +1,34 @@
+import { useRef, useState } from "react";
 import "../home.scss";
+import { useInterview } from "../hooks/userInterview";
+import { useNavigate } from "react-router";
 
 const Home = () => {
-    
+  const navigate = useNavigate();
+  const { loading,generateReport } = useInterview();
+  const [jobDescription, setJobDescription] = useState("");
+  const [selfDescription, setSelfDescription] = useState("");
+  const resumeRef = useRef(null);
+
+  const handleGenerteReport = async () => {
+    const resumeFile = resumeRef.current.files[0];
+    const report = await generateReport(
+      resumeFile,
+      jobDescription,
+      selfDescription
+    );
+    console.log("Generated Report:", report);
+    navigate(`/interview/${report._id}`);
+  };
+  
+  if(loading){
+    return (
+      <div className="loading-screen">
+        <div className="spinner"></div>
+        <p>Generating your interview blueprint...</p>
+      </div>
+    );
+  }
   return (
     <main className='home'>
       <section className='hero-section'>
@@ -24,15 +51,20 @@ const Home = () => {
         <div className='job-card'>
           <div className='card-title'>Job Target</div>
 
-          <textarea placeholder='Paste the target job description...' />
+          <textarea
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            placeholder='Paste the target job description...'
+          />
         </div>
 
         <div className='profile-card'>
           <div className='upload-card'>
-            <input type='file' id='resume' accept='.pdf,.doc,.docx' />
+            <input ref={resumeRef} type='file' id='resume' accept='.pdf,.doc,.docx' />
 
             <label htmlFor='resume'>
               <div className='upload-icon'>↑</div>
+             
 
               <h3>Upload Resume</h3>
 
@@ -42,7 +74,11 @@ const Home = () => {
 
           <div className='profile-divider'>Candidate Snapshot</div>
 
-          <textarea placeholder='Write a short introduction about your skills and experience...' />
+          <textarea
+            value={selfDescription}
+            onChange={(e) => setSelfDescription(e.target.value)}
+            placeholder='Write a short introduction about your skills and experience...'
+          />
         </div>
       </section>
 
@@ -51,7 +87,9 @@ const Home = () => {
           AI analysis usually takes around 20–30 seconds.
         </div>
 
-        <button className='generate-btn'>Generate Interview Blueprint</button>
+        <button className='generate-btn' onClick={handleGenerteReport}>
+          Generate Interview Blueprint
+        </button>
       </section>
     </main>
   );

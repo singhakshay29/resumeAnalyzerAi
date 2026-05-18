@@ -1,14 +1,16 @@
+import {useInterview} from '../hooks/userInterview';
 import '../interview.scss';
 
 import { useState } from "react";
 
-const Interview = ({ data }) => {
+const Interview = () => {
+  const {report} =useInterview();
   const {
     matchScore = 90,
     technicalQuestions = [],
     behaviourQuestions = [],
     skillGaps = [],
-  } = data;
+  } = report;
 
   const [activeTab, setActiveTab] = useState("technical");
   const [openIndex, setOpenIndex] = useState(0);

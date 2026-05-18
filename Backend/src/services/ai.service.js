@@ -87,6 +87,8 @@ IMPORTANT RULES:
 REQUIRED JSON STRUCTURE:
 
 {
+  "title": string,
+  
   "matchScore": number,
 
   "technicalQuestions": [
