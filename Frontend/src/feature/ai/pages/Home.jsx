@@ -17,8 +17,7 @@ const Home = () => {
       jobDescription,
       selfDescription
     );
-    console.log("Generated Report:", report);
-    navigate(`/interview/${report._id}`);
+    navigate(`/interview/${report?._id}`);
   };
   
   if(loading){
