@@ -3,9 +3,7 @@ const cookieParser = require("cookie-parser")
 const cors = require("cors");
 const authRoute = require("./routes/auth.route");
 const interviewRoute = require("./routes/ai.route");
-const mongoose = require("mongoose");
 
-mongoose.set("bufferCommands", false);
 const app = express();
 
 app.use(express.json());
