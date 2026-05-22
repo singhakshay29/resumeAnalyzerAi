@@ -6,21 +6,34 @@ const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
 });
 
-function convertToObjects(arr, keys) {
+const chunkIntoObjects = (arr, keys) => {
+  if (!arr || !Array.isArray(arr)) return [];
+  if (arr.length > 0 && typeof arr[0] === "object") return arr; // already objects
   const result = [];
-
   for (let i = 0; i < arr.length; i += keys.length * 2) {
     const obj = {};
-
-    for (let j = 0; j < keys.length; j++) {
-      obj[keys[j]] = arr[i + j * 2 + 1];
-    }
-
+    keys.forEach((key, j) => {
+      obj[key] = arr[i + j * 2 + 1]; // skip the key strings, grab values
+    });
     result.push(obj);
   }
-
   return result;
-}
+};
+//function convertToObjects(arr, keys) {
+//  const result = [];
+
+//  for (let i = 0; i < arr.length; i += keys.length * 2) {
+//    const obj = {};
+
+//    for (let j = 0; j < keys.length; j++) {
+//      obj[keys[j]] = arr[i + j * 2 + 1];
+//    }
+
+//    result.push(obj);
+//  }
+
+//  return result;
+//}
 
 const technicalQuestionSchema = z.object({
   question: z.string(),
@@ -46,6 +59,7 @@ const preparationPlanSchema = z.object({
 });
 
 const interviewReportSchema = z.object({
+  title: z.string().describe("Title of the job for which the interview report is generated"),
   matchScore: z.number(),
 
   technicalQuestions: z.array(technicalQuestionSchema),
@@ -54,8 +68,7 @@ const interviewReportSchema = z.object({
 
   skillGaps: z.array(skillGapSchema),
 
-  preparationPlanSchema: z.array(preparationPlanSchema),
-  title: z.string().describe("Title of the job for which the interview report is generated"),
+  preparationPlan: z.array(preparationPlanSchema),
 });
 
 async function generateInterviewReport({
@@ -63,116 +76,113 @@ async function generateInterviewReport({
   selfDescription,
   jobDescription,
 }) {
-  const prompt = `
-Generate an interview report for the candidate.
-
-Resume:
-${resume}
-
-Self Description:
-${selfDescription}
-
-Job Description:
-${jobDescription}
-
-IMPORTANT RULES:
-- Return ONLY valid JSON
-- No markdown
-- No explanation
-- Follow the schema EXACTLY
-- Do not change field names
-- Every array item must match schema structure
-- Generate realistic interview preparation data
-
-REQUIRED JSON STRUCTURE:
-
-{
-  "title": string,
+  const maxRetries = 3;
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      const prompt = `
+      Generate an interview report for the candidate.
+      
+      Resume:
+      ${resume}
+      
+      Self Description:
+      ${selfDescription}
+      
+      Job Description:
+      ${jobDescription}
+      
+      IMPORTANT RULES:
+      - Return ONLY valid JSON
+      - No markdown
+      - No explanation
+      - Follow the schema EXACTLY
+      - Do not change field names
+      - Every array item must match schema structure
+      - Generate realistic interview preparation data
+      
+      REQUIRED JSON STRUCTURE:
+      
+      {
+        "title": string,
+        
+        "matchScore": number,
+      
+        "technicalQuestions": [
+          {
+            "question": string,
+            "intention": string,
+            "answer": string
+          }
+        ],
+      
+        "behaviourQuestions": [
+          {
+            "question": string,
+            "intention": string,
+            "answer": string
+          }
+        ],
+      
+        "skillGaps": [
+          {
+            "skill": string,
+            "severity": "Low" | "Medium" | "High"
+          }
+        ],
+      
+       "preparationPlan": [
+          {
+            "day": number,
+            "focus": string,
+            "task": [string]
+          }
+        ]
+      }
+      
+      Generate:
+      - 5 technicalQuestions
+      - 3 behaviourQuestions
+      - 3 skillGaps
+      - 7 preparationPlan items
+      `;
+       
+      const response = await ai.models.generateContent({
+        model: "gemini-3-flash-preview",
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          responseSchema: zodToJsonSchema(interviewReportSchema),
+        },
+      });
+      const parsed = JSON.parse(response.text);
   
-  "matchScore": number,
+      parsed.technicalQuestions = chunkIntoObjects(parsed.technicalQuestions, ["question", "intention", "answer"]);
+      parsed.behaviourQuestions = chunkIntoObjects(parsed.behaviourQuestions, ["question", "intention", "answer"]);
+      parsed.skillGaps = chunkIntoObjects(parsed.skillGaps, ["skill", "severity"]);
+      parsed.preparationPlan = chunkIntoObjects(parsed.preparationPlan, ["day", "focus", "task"]);
+      parsed.preparationPlan = parsed.preparationPlan.map((item) => ({
+        ...item,
+        task: Array.isArray(item.task) ? item.task : [item.task],
+      }));
 
-  "technicalQuestions": [
-    {
-      "question": string,
-      "intention": string,
-      "answer": string
+      console.log("Parsed technicalQuestions:", parsed.technicalQuestions);
+  
+      const validated = interviewReportSchema.parse(parsed);
+      
+      return validated;
+    } catch (error) {
+      console.error(`Attempt ${attempt} failed:`, error.message);
+  
+      if (attempt < maxRetries && (error.status === 503 || error.status === 429)) {
+        const delay = 2000 * attempt;
+        console.log(`Retrying in ${delay}ms...`);
+        await new Promise((res) => setTimeout(res, delay));
+        continue;
+      }
+  
+      throw error;
     }
-  ],
-
-  "behaviourQuestions": [
-    {
-      "question": string,
-      "intention": string,
-      "answer": string
-    }
-  ],
-
-  "skillGaps": [
-    {
-      "skill": string,
-      "severity": "Low" | "Medium" | "High"
-    }
-  ],
-
-  "preparationPlanSchema": [
-    {
-      "day": number,
-      "focus": string,
-      "task": [string]
-    }
-  ]
-}
-
-Generate:
-- 5 technicalQuestions
-- 3 behaviourQuestions
-- 3 skillGaps
-- 7 preparationPlanSchema items
-`;
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: {
-        responseMimeType: "application/json",
-        responseSchema: zodToJsonSchema(interviewReportSchema),
-      },
-    });
-    console.log("AI Response:", JSON.parse(response.text));
-    const parsed = JSON.parse(response.text);
-
-    parsed.technicalQuestions = convertToObjects(parsed.technicalQuestions, [
-      "question",
-      "intention",
-      "answer",
-    ]);
-
-    parsed.behaviourQuestions = convertToObjects(parsed.behaviourQuestions, [
-      "question",
-      "intention",
-      "answer",
-    ]);
-
-    parsed.skillGaps = convertToObjects(parsed.skillGaps, [
-      "skill",
-      "severity",
-    ]);
-
-    parsed.preparationPlanSchema = convertToObjects(
-      parsed.preparationPlanSchema,
-      ["day", "focus", "task"]
-    );
-
-    parsed.preparationPlanSchema = parsed.preparationPlanSchema.map((item) => ({
-      ...item,
-      task: Array.isArray(item.task) ? item.task : [item.task],
-    }));
-
-    const validated = interviewReportSchema.parse(parsed);
     
-    return validated;
-  } catch (error) {
-    console.error("Error generating interview report:", error);
   }
 }
 

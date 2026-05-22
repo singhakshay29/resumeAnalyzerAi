@@ -6,7 +6,7 @@ const interviewRoute = require("./routes/ai.route");
 
 const app = express();
 
-app.use(express.json());
+
 app.use(cookieParser())
 app.use(cors({
   origin:[
@@ -15,6 +15,14 @@ app.use(cors({
   ],
   credentials: true,
 }));
+
+app.use((req, res, next) => {
+  if (req.is("multipart/form-data")) {
+    return next();
+  }
+  express.json()(req, res, next);
+});
+
 
 app.use("/api/auth", authRoute);
 app.use("/api/interview", interviewRoute);
