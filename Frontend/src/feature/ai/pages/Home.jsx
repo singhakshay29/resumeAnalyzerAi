@@ -11,6 +11,10 @@ const Home = () => {
   const resumeRef = useRef(null);
 
   const handleGenerteReport = async () => {
+    if(jobDescription.trim() === "" || selfDescription.trim() === "" || !resumeRef.current.files[0]){
+      alert("Please fill in all fields and upload your resume.");
+      return;
+    }
     const resumeFile = resumeRef.current.files[0];
     const report = await generateReport(
       resumeFile,
