@@ -109,3 +109,49 @@ html, body,#root{
   .gap{
     margin-top: 2rem;
   }
+  
+  .navbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+  
+      display: flex;
+      align-items: center;
+      justify-content: center;
+  
+      border-radius: 12px;
+  
+      background: linear-gradient(
+        135deg,
+        #8b5cf6,
+        #06b6d4
+      );
+  
+      font-size: 1.2rem;
+    }
+  
+    h1 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      margin: 0;
+  
+      background: linear-gradient(
+        135deg,
+        #ffffff,
+        #c4b5fd
+      );
+  
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+  
+    span {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.55);
+      display: block;
+    }
+  }
