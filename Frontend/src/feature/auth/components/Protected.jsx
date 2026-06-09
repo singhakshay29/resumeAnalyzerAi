@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { useNavigate } from "react-router";
+import { Outlet, useNavigate } from "react-router";
+import {Navbar} from "../../../components/Navbar";
 
 const Protected = ({ children }) => {
   const { loading, user } = useAuth();
@@ -17,5 +18,18 @@ const Protected = ({ children }) => {
  
   return children;
 };
+
+const ProtectedLayout = () => {
+  return (
+    <>
+      <Navbar />
+      <div className="gap">
+      <Outlet />
+      </div>
+    </>
+  );
+};
+
+export {ProtectedLayout};
 
 export default Protected;

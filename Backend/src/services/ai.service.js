@@ -19,21 +19,6 @@ const chunkIntoObjects = (arr, keys) => {
   }
   return result;
 };
-//function convertToObjects(arr, keys) {
-//  const result = [];
-
-//  for (let i = 0; i < arr.length; i += keys.length * 2) {
-//    const obj = {};
-
-//    for (let j = 0; j < keys.length; j++) {
-//      obj[keys[j]] = arr[i + j * 2 + 1];
-//    }
-
-//    result.push(obj);
-//  }
-
-//  return result;
-//}
 
 const technicalQuestionSchema = z.object({
   question: z.string(),
