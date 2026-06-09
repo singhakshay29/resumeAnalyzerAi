@@ -43,3 +43,17 @@ const api = axios.create({
       return null;
     }
   }
+  
+  export async function downloadReportPdf(id){
+    try {
+      const response = await api.get(
+        `/report/${id}/download`,
+        {
+          responseType: "blob",
+        }
+      );
+     return response;
+    } catch (error) {
+      console.error("Error downloading interview report:", error);
+    }
+  };

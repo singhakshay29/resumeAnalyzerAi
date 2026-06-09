@@ -26,19 +26,9 @@
     color: white;
   
     @media (max-width: 1200px) {
-      .content-section {
-        order: 1;
-      }
-    
-      .stats-panel {
-        order: 2;
-        position: static;
-      }
-    
-      .sidebar {
-        order: 3;
-        position: static;
-      }
+     display: flex;
+     flex-direction: column;
+     gap: 2rem;
     }
   }
   
@@ -69,8 +59,8 @@
   
   .sidebar {
     height: fit-content;
-    position: sticky;
     top: 2rem;
+    bottom: 2rem;
   }
   
   .sidebar-title {
@@ -416,6 +406,8 @@
   }
   
   .content-top {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 1.5rem;
   }
   
@@ -445,5 +437,29 @@
       background: rgba(139, 92, 246, 0.15);
       color: white;
       transform: translateX(-3px);
+    }
+  }
+  
+  .download-btn {
+    border: none;
+    cursor: pointer;
+  
+    padding: 0.8rem 1.2rem;
+  
+    border-radius: 14px;
+  
+    background: linear-gradient(
+      135deg,
+      #8b5cf6,
+      #06b6d4
+    );
+  
+    color: white;
+    font-weight: 600;
+  
+    transition: 0.3s ease;
+  
+    &:hover {
+      transform: translateY(-2px);
     }
   }

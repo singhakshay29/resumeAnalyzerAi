@@ -3,6 +3,7 @@ import "../interview.scss";
 import { useNavigate, useParams } from "react-router";
 
 import { useEffect, useState } from "react";
+import {downloadReportPdf} from "../services/interview.api";
 
 const Interview = () => {
   const navigate = useNavigate();
@@ -19,6 +20,30 @@ const Interview = () => {
   if (loading || !report) {
     return <div>Loading...</div>;
   }
+  const downloadReport = async () => {
+    try {
+      const response =await downloadReportPdf(id);
+
+      const url = window.URL.createObjectURL(
+        response.data
+      );
+
+      const link = document.createElement("a");
+
+      link.href = url;
+      link.download = "interview-report.pdf";
+
+      document.body.appendChild(link);
+
+      link.click();
+
+      link.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   let {
     matchScore = 90,
@@ -52,6 +77,9 @@ const Interview = () => {
         <div className='content-top'>
           <button className='back-btn' onClick={() => navigate(-1)}>
             ← Back to All Reports
+          </button>
+          <button className='download-btn' onClick={downloadReport}>
+            Download PDF
           </button>
         </div>
         <div className='section-header'>

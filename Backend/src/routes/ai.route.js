@@ -11,4 +11,6 @@ interviewRouter.get('/report/:id',authMiddleware.authUser, interviewController.g
 
 interviewRouter.get('/all_reports',authMiddleware.authUser, interviewController.getAllInterviewReportsByUser)
 
+interviewRouter.get('/report/:id/download',authMiddleware.authUser, interviewController.downloadReport)
+
 module.exports=interviewRouter;
