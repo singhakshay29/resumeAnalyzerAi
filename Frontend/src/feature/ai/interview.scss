@@ -26,7 +26,9 @@
     color: white;
   
     @media (max-width: 1200px) {
-      grid-template-columns: 1fr;
+     display: flex;
+     flex-direction: column;
+     gap: 2rem;
     }
   }
   
@@ -57,8 +59,8 @@
   
   .sidebar {
     height: fit-content;
-    position: sticky;
     top: 2rem;
+    bottom: 2rem;
   }
   
   .sidebar-title {
@@ -179,6 +181,7 @@
   }
   
   .question-header {
+    align-items: flex-start;
     padding: 1.5rem;
   
     display: flex;
@@ -222,6 +225,8 @@
   }
   
   .toggle-icon {
+    flex-shrink: 0;
+    margin-top: 4px;
     font-size: 1.5rem;
   
     color:
@@ -397,5 +402,64 @@
         rgba(34, 197, 94, 0.15);
   
       color: #4ade80;
+    }
+  }
+  
+  .content-top {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1.5rem;
+  }
+  
+  .back-btn {
+    border: none;
+    outline: none;
+  
+    cursor: pointer;
+  
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  
+    padding: 0.8rem 1.2rem;
+  
+    border-radius: 14px;
+  
+    background: rgba(255, 255, 255, 0.05);
+  
+    color: rgba(255, 255, 255, 0.8);
+  
+    font-weight: 600;
+  
+    transition: all 0.3s ease;
+  
+    &:hover {
+      background: rgba(139, 92, 246, 0.15);
+      color: white;
+      transform: translateX(-3px);
+    }
+  }
+  
+  .download-btn {
+    border: none;
+    cursor: pointer;
+  
+    padding: 0.8rem 1.2rem;
+  
+    border-radius: 14px;
+  
+    background: linear-gradient(
+      135deg,
+      #8b5cf6,
+      #06b6d4
+    );
+  
+    color: white;
+    font-weight: 600;
+  
+    transition: 0.3s ease;
+  
+    &:hover {
+      transform: translateY(-2px);
     }
   }

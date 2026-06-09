@@ -1,52 +1,117 @@
-import {useState} from "react";
-import {Link, useNavigate} from "react-router"
-import {useAuth} from "../hooks/useAuth";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { useAuth } from "../hooks/useAuth";
+import "../auth.form.scss";
 
 const Register = () => {
   const navigate = useNavigate();
-  const {loading, handleResgister} = useAuth();
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  
+  const { loading, handleResgister } = useAuth();
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(!name || !email || !password || name === '' || email === '' || password === '') return;
-    await handleResgister({userName:name, email, password});
-    navigate('/');
-  }
-  
-  if(loading){
-    return <div className='loading'>Loading...</div>
+    if (
+      !name ||
+      !email ||
+      !password ||
+      name === "" ||
+      email === "" ||
+      password === ""
+    )
+      return;
+    await handleResgister({ userName: name, email, password });
+    navigate("/");
+  };
+
+  if (loading) {
+    return <div className='loading'>Loading...</div>;
   }
 
   return (
     <main>
+      <section className='main'>
+        <span className='tag'>AI Career Assistant</span>
+        <div className='herocontent'>
+          <h1>
+            Accelerate Your
+            <span> Career Growth</span>
+          </h1>
+
+          <p className='p-section'>
+            Create an account to unlock AI-powered resume analysis, ATS scoring,
+            personalized interview preparation, and actionable career insights
+            tailored to your target role.
+          </p>
+
+          <div className='features'>
+            <div>✓ Resume Analysis</div>
+            <div>✓ ATS Compatibility Score</div>
+            <div>✓ Skill Gap Identification</div>
+            <div>✓ Personalized Interview Questions</div>
+            <div>✓ AI-Powered Career Recommendations</div>
+          </div>
+        </div>
+      </section>
       <div className='form-container'>
-      <h2 className='heading'>Create Your Account</h2>
+        <h2 className='heading'>Create Your Account</h2>
         <form onSubmit={handleSubmit}>
-        <div className='input-group'>
+          <div className='input-group'>
             <label htmlFor='name'>Full Name</label>
-            <input type='name' value={name} name="name" placeholder='Enter Full Name' required  onChange={(e)=>setName(e.target.value)}/>
+            <input
+              type='name'
+              value={name}
+              name='name'
+              placeholder='Enter Full Name'
+              required
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className='input-group'>
             <label htmlFor='email'>Email</label>
-            <input type='email' value={email} name="email" placeholder='Enter Email address' required onChange={(e)=>setEmail(e.target.value)}/>
+            <input
+              type='email'
+              value={email}
+              name='email'
+              placeholder='Enter Email address'
+              required
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div className='input-group'>
             <label htmlFor='password'>Password</label>
-            <input type='password' value={password} name="password" placeholder='Enter Password' required onChange={(e)=>setPassword(e.target.value)}/>
+            <div className='password-field'>
+              <input
+                type={showPassword ? "text" : "password"}
+                name='password'
+                value={password}
+                placeholder='Enter Password'
+                required
+                onChange={(e) => setPassword(e.target.value)}
+              />
+
+              <button
+                type='button'
+                className='toggle-password'
+                onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
           </div>
-          
-          <button type='submit' className='btn-submit'>Register</button>
-          <div className="navigation">
+
+          <button type='submit' className='btn-submit'>
+            Register
+          </button>
+          <div className='navigation'>
             <span>Already have an account?</span>
-            <Link to="/login">Login</Link>
+            <Link to='/login'>Login</Link>
           </div>
         </form>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;

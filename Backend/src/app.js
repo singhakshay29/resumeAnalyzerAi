@@ -8,13 +8,8 @@ const app = express();
 
 
 app.use(cookieParser())
-app.use(cors({
-  origin:[
-    "http://localhost:5173",
-    "https://resume-analyzer-ai-lime-nine.vercel.app",
-  ],
-  credentials: true,
-}));
+app.use(express.static("public"));
+app.use(cors());
 
 app.use((req, res, next) => {
   if (req.is("multipart/form-data")) {

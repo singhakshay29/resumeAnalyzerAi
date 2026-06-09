@@ -4,7 +4,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 2rem;
+  padding-left: 4rem;
+  padding-right: 4rem;
   background: linear-gradient(
     135deg,
     #020617,
@@ -37,6 +38,53 @@ main {
     bottom: -120px;
     right: -120px;
   }
+  @media (max-width: 850px) {
+    display: flex;
+    flex-direction: column;
+    gap:5rem;
+    text-align: center;
+    align-items: center;
+  }
+}
+
+.herocontent {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  h1 {
+    font-size: clamp(3rem, 7vw, 5rem);
+    line-height: 1.1;
+    font-weight: 800;
+
+    span {
+      background:
+        linear-gradient(
+          135deg,
+          #8b5cf6,
+          #06b6d4
+        );
+
+      -webkit-background-clip: text;
+      color: transparent;
+    }
+  }
+
+  p {
+    max-width: 900px;
+    color:
+      rgba(255, 255, 255, 0.65);
+
+    font-size: 1.05rem;
+
+    line-height: 1.8;
+  }
+  
+  .features {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+ 
 }
 
 .form-container {
@@ -113,6 +161,25 @@ form {
     }
   }
 }
+.password-field {
+  position: relative;
+}
+
+.password-field input {
+  width: 100%;
+  padding-right: 45px;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+}
 
 .btn-submit {
   margin-top: 0.5rem;
@@ -184,3 +251,4 @@ form {
   color: white;
   font-size: 1.2rem;
 }
+

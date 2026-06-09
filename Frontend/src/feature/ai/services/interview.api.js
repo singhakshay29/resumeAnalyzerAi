@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-    baseURL: "https://resume-analyzer-ai-backend.vercel.app/api/interview",
+    baseURL: "/api/interview",
     withCredentials: true,
   });
   
@@ -43,3 +43,17 @@ const api = axios.create({
       return null;
     }
   }
+  
+  export async function downloadReportPdf(id){
+    try {
+      const response = await api.get(
+        `/report/${id}/download`,
+        {
+          responseType: "blob",
+        }
+      );
+     return response;
+    } catch (error) {
+      console.error("Error downloading interview report:", error);
+    }
+  };

@@ -1,6 +1,7 @@
 const pdfParse=require('pdf-parse');
 const {generateInterviewReport} = require('../services/ai.service');
 const interviewReportModal = require('../models/interview.modal');
+const generateInterviewPdf = require('../utils/generate');
 
 async function generateInterviewReportController(req,res){ 
     try {
@@ -86,4 +87,28 @@ async function getAllInterviewReportsByUser(req,res){
     }
 }
 
-module.exports={generateInterviewReportController,getInterviewReportById,getAllInterviewReportsByUser}
+async function downloadReport (req, res){
+    try {
+      const { id } = req.params;
+  
+      const report = await interviewReportModal.findById(id);
+  
+      if (!report) {
+        return res.status(404).json({
+          success: false,
+          message: "Report not found",
+        });
+      }
+  
+      generateInterviewPdf(report, res);
+    } catch (error) {
+      console.error(error);
+  
+      res.status(500).json({
+        success: false,
+        message: "Failed to generate PDF",
+      });
+    }
+  };
+
+module.exports={generateInterviewReportController,getInterviewReportById,getAllInterviewReportsByUser,downloadReport}
