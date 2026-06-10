@@ -6,7 +6,10 @@ async function registerUserController(req, res) {
   try {
     const { userName, email, password } = req.body;
     if (!userName || !email || !password) {
-      return res.status(400).json({ message: "Please provide all details" });
+      return res.status(400).json({
+        success: false,
+        message: "Username, email and password are required",
+      });
     }
 
     const isUserAlreadyExist = await userModal.findOne({
@@ -14,8 +17,12 @@ async function registerUserController(req, res) {
     });
 
     if (isUserAlreadyExist) {
-      return res.status(400).json({
-        message: "Account already Exist",
+      return res.status(409).json({
+        success: false,
+        message:
+        isUserAlreadyExist.email === email
+            ? "Email is already registered"
+            : "Username is already taken",
       });
     }
 
@@ -29,7 +36,8 @@ async function registerUserController(req, res) {
     );
     res.cookie("token", token);
     res.status(201).json({
-      message: "User registered successfully",
+      success: true,
+      message: "Account created successfully",
       user: {
         id: user._id,
         userName: user.userName,
@@ -38,26 +46,41 @@ async function registerUserController(req, res) {
     });
   } catch (error) {
     console.error("registerUserController error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Unable to create account. Please try again later.",
+    });
   }
 }
 
 async function loginUserController(req, res) {
   try {
     const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Email and password are required",
+      });
+    }
 
     const user = await userModal.findOne({ email });
 
     if (!user) {
-      return res.status(400).json({
+      return res.status(401).json({
+        success: false,
         message: "Invalid email or password",
       });
     }
 
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
-      return res.status(400).json({ message: "Invalid email or password" });
+      return res.status(401).json({
+        success: false,
+        message: "Invalid email or password",
+      });
     }
 
     const token = jwt.sign(
@@ -67,8 +90,9 @@ async function loginUserController(req, res) {
     );
 
     res.cookie("token", token);
-    res.status(200).json({
-      message: "User Logged in Successfully",
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
       user: {
         id: user._id,
         userName: user.userName,
@@ -77,7 +101,10 @@ async function loginUserController(req, res) {
     });
   } catch (error) {
     console.error("loginUserController error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      message: "Unable to login. Please try again later.",
+    });
   }
 }
 

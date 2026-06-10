@@ -2,6 +2,7 @@ import { Link, useNavigate } from "react-router";
 import "../auth.form.scss";
 import { useAuth } from "../hooks/useAuth";
 import { useEffect, useState } from "react";
+import Loader from "../../../components/Loader";
 const Login = () => {
   const navigate = useNavigate();
   const { loading, handleLogin, user } = useAuth();
@@ -37,7 +38,10 @@ const Login = () => {
   }, [user, navigate]);
 
   if (loading) {
-    return <div className='loading'>Loading...</div>;
+    return  <Loader
+    title="Checking Authentication"
+    message="Verifying your account and preparing your workspace."
+  />;
   }
 
   return (

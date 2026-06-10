@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 import "../auth.form.scss";
+import Loader from "../../../components/Loader";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,7 +33,10 @@ const Register = () => {
   };
 
   if (loading) {
-    return <div className='loading'>Loading...</div>;
+    return  <Loader
+    title="Checking Authentication"
+    message="Verifying your account and preparing your workspace."
+  />;
   }
 
   return (

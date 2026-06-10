@@ -2,6 +2,18 @@ import { useContext } from "react";
 import { AuthContext } from "../auth.context";
 import { loginUser, logoutUser, registerUser } from "../services/auth.api";
 
+const getErrorMessage = (error) => {
+  if (error.response?.data?.message) {
+    return error.response.data.message;
+  }
+
+  if (error.code === "ERR_NETWORK") {
+    return "Unable to connect to server. Please try again later.";
+  }
+
+  return error.message || "Something went wrong";
+};
+
 export const useAuth = () => {
   const context = useContext(AuthContext);
   const { user, setUser, loading, setLoading } = context;
@@ -16,16 +28,9 @@ export const useAuth = () => {
         user: response.user,
       };
     } catch (error) {
-      // eslint-disable-next-line no-useless-assignment
-      let message = "Something went wrong";
-      if (!error.response) {
-        message = "Unable to connect to server. Please try again later.";
-      } else {
-        message = error.message || "Login failed";
-      }
       return {
         success: false,
-        message
+        message: getErrorMessage(error),
       };
     } finally {
       setLoading(false);
@@ -42,16 +47,9 @@ export const useAuth = () => {
         user: response.user,
       };
     } catch (error) {
-      // eslint-disable-next-line no-useless-assignment
-      let message = "Something went wrong";
-      if (!error.response) {
-        message = "Unable to connect to server. Please try again later.";
-      } else {
-        message = error.message || "Login failed";
-      }
       return {
         success: false,
-        message
+        message: getErrorMessage(error),
       };
     } finally {
       setLoading(false);
