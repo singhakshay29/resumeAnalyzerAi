@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieParser = require("cookie-parser")
 const cors = require("cors");
+const path = require("path");
 const authRoute = require("./routes/auth.route");
 const interviewRoute = require("./routes/ai.route");
 
@@ -24,7 +25,7 @@ app.use("/api/interview", interviewRoute);
 
 app.use(express.static(path.join(__dirname, "public")));
 
-app.get("*", (req, res) => {
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
