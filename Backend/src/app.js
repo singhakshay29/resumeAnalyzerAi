@@ -23,10 +23,16 @@ app.use((req, res, next) => {
 app.use("/api/auth", authRoute);
 app.use("/api/interview", interviewRoute);
 
-app.use(express.static(path.join(__dirname, "public")));
+app.use(
+  express.static(
+    path.join(__dirname, "../public")
+  )
+);
 
 app.use((req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.sendFile(
+    path.join(__dirname, "../public", "index.html")
+  );
 });
 
 module.exports = app;

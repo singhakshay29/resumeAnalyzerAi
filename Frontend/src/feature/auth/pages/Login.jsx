@@ -6,14 +6,28 @@ const Login = () => {
   const navigate = useNavigate();
   const { loading, handleLogin, user } = useAuth();
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password || email === "" || password === "") return;
-    await handleLogin({ email, password });
-    navigate("/");
+    setError("");
+
+    if (!email || !password) {
+      setError("Please enter email and password.");
+      return;
+    }
+
+    const result = await handleLogin({
+      email,
+      password,
+    });
+    if (result.success) {
+      navigate("/");
+    } else {
+      setError(result.message);
+    }
   };
 
   useEffect(() => {
@@ -88,9 +102,10 @@ const Login = () => {
               </button>
             </div>
           </div>
+          {error && <div className='error-message'>{error}</div>}
 
-          <button type='submit' className='btn-submit'>
-            Login
+          <button type='submit' className='btn-submit' disabled={loading}>
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
         <div className='navigation'>

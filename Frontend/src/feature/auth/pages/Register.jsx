@@ -8,6 +8,7 @@ const Register = () => {
   const { loading, handleResgister } = useAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [password, setPassword] = useState("");
 
@@ -22,8 +23,12 @@ const Register = () => {
       password === ""
     )
       return;
-    await handleResgister({ userName: name, email, password });
-    navigate("/");
+      const result = await handleResgister({ userName: name, email, password });
+      if (result.success) {
+        navigate("/");
+      } else {
+        setError(result.message);
+      }
   };
 
   if (loading) {
@@ -100,9 +105,10 @@ const Register = () => {
               </button>
             </div>
           </div>
-
+           {error && <div className='error-message'>{error}</div>}
           <button type='submit' className='btn-submit'>
-            Register
+          
+            {loading ? "Register in..." : "Register"}
           </button>
           <div className='navigation'>
             <span>Already have an account?</span>

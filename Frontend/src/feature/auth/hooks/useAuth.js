@@ -11,8 +11,22 @@ export const useAuth = () => {
     try {
       const response = await loginUser({ email, password });
       setUser(response.user);
+      return {
+        success: true,
+        user: response.user,
+      };
     } catch (error) {
-      console.log("Login error:", error);
+      // eslint-disable-next-line no-useless-assignment
+      let message = "Something went wrong";
+      if (!error.response) {
+        message = "Unable to connect to server. Please try again later.";
+      } else {
+        message = error.message || "Login failed";
+      }
+      return {
+        success: false,
+        message
+      };
     } finally {
       setLoading(false);
     }
@@ -23,8 +37,22 @@ export const useAuth = () => {
     try {
       const response = await registerUser({ userName, email, password });
       setUser(response.user);
+      return {
+        success: true,
+        user: response.user,
+      };
     } catch (error) {
-      console.log("Registration error:", error);
+      // eslint-disable-next-line no-useless-assignment
+      let message = "Something went wrong";
+      if (!error.response) {
+        message = "Unable to connect to server. Please try again later.";
+      } else {
+        message = error.message || "Login failed";
+      }
+      return {
+        success: false,
+        message
+      };
     } finally {
       setLoading(false);
     }
@@ -35,8 +63,18 @@ export const useAuth = () => {
     try {
       await logoutUser();
       setUser(null);
+      return {
+        success: true,
+        message: "Logged out successfully",
+      };
     } catch (error) {
-      console.log("Logout error:", error);
+      
+      return {
+        success: false,
+        message:
+          error ||
+          "Failed to logout",
+      };
     } finally {
       setLoading(false);
     }

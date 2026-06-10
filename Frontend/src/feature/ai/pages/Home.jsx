@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import "../home.scss";
 import { useInterview } from "../hooks/userInterview";
 import { useNavigate } from "react-router";
+import Loader from "../../../components/Loader";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -26,10 +27,10 @@ const Home = () => {
   
   if(loading){
     return (
-      <div className="loading-screen">
-        <div className="spinner"></div>
-        <p>Generating your interview blueprint...</p>
-      </div>
+      <Loader
+      title="Checking Authentication"
+      message="Verifying your account and preparing your workspace."
+    />
     );
   }
   return (

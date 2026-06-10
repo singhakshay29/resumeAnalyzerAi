@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { getAllInterviewReportsByUser } from "../services/interview.api";
 import "../reports.scss";
 import {useNavigate} from "react-router";
+import Loader from "../../../components/Loader";
 
 const Reports = () => {
     const navigate = useNavigate();
@@ -28,7 +29,10 @@ const Reports = () => {
   }, []);
 
   if (loading) {
-    return <div className='reports-loading'>Loading...</div>;
+    return  <Loader
+    title="Loading Reports"
+    message="Fetching your generated interview reports."
+  />
   }
 
   if (reports.length === 0) {

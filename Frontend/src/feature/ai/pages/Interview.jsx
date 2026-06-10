@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router";
 
 import { useEffect, useState } from "react";
 import {downloadReportPdf} from "../services/interview.api";
+import Loader from "../../../components/Loader";
 
 const Interview = () => {
   const navigate = useNavigate();
@@ -18,7 +19,10 @@ const Interview = () => {
   }, [id]);
 
   if (loading || !report) {
-    return <div>Loading...</div>;
+    return  <Loader
+    title="Preparing Your Interview Blueprint"
+    message="Analyzing your resume, matching skills, and generating personalized interview questions."
+  />;
   }
   const downloadReport = async () => {
     try {

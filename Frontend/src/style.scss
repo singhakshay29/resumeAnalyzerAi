@@ -155,3 +155,73 @@ html, body,#root{
       display: block;
     }
   }
+  
+  .loader-screen {
+    min-height: 100vh;
+  
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  
+    background:
+      radial-gradient(
+        circle at top right,
+        rgba(139, 92, 246, 0.18),
+        transparent 25%
+      ),
+      radial-gradient(
+        circle at bottom left,
+        rgba(6, 182, 212, 0.12),
+        transparent 25%
+      ),
+      #050816;
+  
+    padding: 2rem;
+  }
+  
+  .loader-content {
+    text-align: center;
+    max-width: 550px;
+  
+    h2 {
+      margin-top: 2rem;
+      font-size: 2rem;
+      font-weight: 700;
+      color: white;
+    }
+  
+    p {
+      margin-top: 1rem;
+  
+      color: rgba(255, 255, 255, 0.65);
+  
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+  }
+  
+  .loader-spinner {
+    width: 90px;
+    height: 90px;
+  
+    margin: 0 auto;
+  
+    border-radius: 50%;
+  
+    border: 4px solid rgba(255, 255, 255, 0.08);
+  
+    border-top-color: #8b5cf6;
+    border-right-color: #06b6d4;
+  
+    animation: spin 1s linear infinite;
+  
+    box-shadow:
+      0 0 20px rgba(139, 92, 246, 0.35),
+      0 0 40px rgba(6, 182, 212, 0.2);
+  }
+  
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }

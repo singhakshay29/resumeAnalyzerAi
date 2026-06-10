@@ -252,3 +252,20 @@ form {
   font-size: 1.2rem;
 }
 
+.error-message {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+
+  padding: 0.9rem 1rem;
+
+  border-radius: 12px;
+
+  background: rgba(239, 68, 68, 0.12);
+
+  border: 1px solid rgba(239, 68, 68, 0.25);
+
+  color: #fca5a5;
+
+  font-size: 0.95rem;
+  font-weight: 500;
+}
