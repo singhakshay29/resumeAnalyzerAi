@@ -6,7 +6,7 @@ const api = axios.create({
 });
 export async function registerUser({ userName, email, password }) {
   try {
-    const response = await api.post("/api/auth/register", {
+    const response = await api.post("/register", {
       userName,
       email,
       password,
@@ -31,7 +31,7 @@ export async function loginUser({ email, password }) {
 
 export async function logoutUser() {
   try {
-    const response = await api.get("/api/auth/logout");
+    const response = await api.get("/logout");
     return response.data;
   } catch (error) {
     console.log("Error logging out user:", error);
