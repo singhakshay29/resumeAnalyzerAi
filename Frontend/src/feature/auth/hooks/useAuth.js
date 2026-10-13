@@ -66,14 +66,12 @@ export const useAuth = () => {
         message: "Logged out successfully",
       };
     } catch (error) {
-      
       return {
         success: false,
-        message:
-          error ||
-          "Failed to logout",
+        message: getErrorMessage(error),
       };
     } finally {
+      setUser(null);
       setLoading(false);
     }
   };

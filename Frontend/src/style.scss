@@ -23,6 +23,7 @@ html, body,#root{
     -webkit-backdrop-filter: blur(12px);
   
     background: rgba(2, 8, 23, 0.4);
+    animation: navbar-enter 500ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
   }
   
   .navbar-container {
@@ -57,10 +58,11 @@ html, body,#root{
     font-size: 0.95rem;
     cursor: pointer;
   
-    transition: color 0.3s ease;
+    transition: color 0.2s ease, transform 0.2s ease;
   
     &:hover {
       color: #ffffff;
+      transform: translateY(-1px);
     }
   }
   
@@ -80,10 +82,16 @@ html, body,#root{
       #8b5cf6 100%
     );
   
-    transition: transform 0.3s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
   
     &:hover {
-      transform: scale(1.05);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(99, 102, 241, 0.3);
+    }
+
+    &:disabled {
+      cursor: wait;
+      opacity: 0.7;
     }
   }
   
@@ -97,7 +105,8 @@ html, body,#root{
     }
   
     .navbar-link {
-      display: none;
+      display: inline-flex;
+      font-size: 0.84rem;
     }
   
     .navbar-btn {
@@ -114,6 +123,17 @@ html, body,#root{
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    padding: 0;
+    border: 0;
+    color: inherit;
+    text-align: left;
+    background: transparent;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
   
     .brand-icon {
       width: 42px;
@@ -149,10 +169,30 @@ html, body,#root{
       color: transparent;
     }
   
-    span {
-      font-size: 0.75rem;
-      color: rgba(255,255,255,0.55);
-      display: block;
+    .brand-copy {
+      display: grid;
+      gap: 1px;
+    }
+
+    .brand-name {
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 750;
+      letter-spacing: -0.045em;
+      line-height: 1.1;
+    }
+
+    .brand-accent {
+      display: inline;
+      color: #a78bfa;
+    }
+
+    .brand-caption {
+      color: rgba(255,255,255,0.52);
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.035em;
+      line-height: 1.2;
     }
   }
   
@@ -177,6 +217,21 @@ html, body,#root{
       #050816;
   
     padding: 2rem;
+  }
+
+  @keyframes navbar-enter {
+    from { opacity: 0; transform: translateY(-12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .navbar,
+    .navbar-brand,
+    .navbar-link,
+    .navbar-btn {
+      animation: none !important;
+      transition: none !important;
+    }
   }
   
   .loader-content {

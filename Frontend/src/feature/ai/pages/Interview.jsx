@@ -5,18 +5,26 @@ import { useNavigate, useParams } from "react-router";
 import { useEffect, useState } from "react";
 import {downloadReportPdf} from "../services/interview.api";
 import Loader from "../../../components/Loader";
+import PreparationPlan from "../components/PreparationPlan";
 
 const Interview = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("technical");
   const [openIndex, setOpenIndex] = useState(0);
-  const { report, genrateReportById, loading } = useInterview();
+  const { report, error, genrateReportById, loading, setSavedStatus, setTaskCompleted, setReport } = useInterview();
+  const [saveBusy, setSaveBusy] = useState(false);
+  const [progressError, setProgressError] = useState("");
   const { id } = useParams();
   useEffect(() => {
+    window.scrollTo(0, 0);
     if (id) {
       genrateReportById(id);
     }
-  }, [id]);
+  }, [id, genrateReportById]);
+
+  if (error && !loading && !report) {
+    return <main className="interview-page interview-page--error"><section className="content-section"><p role="alert">{error}</p><button className="back-btn" onClick={() => navigate("/reports")}>Back to reports</button></section></main>;
+  }
 
   if (loading || !report) {
     return  <Loader
@@ -56,6 +64,35 @@ const Interview = () => {
     skillGaps = [],
   } = report;
 
+  const handleSaveStatus = async () => {
+    setSaveBusy(true);
+    setProgressError("");
+    try {
+      await setSavedStatus(id, !report.isSaved);
+    } catch (error) {
+      setProgressError(error.response?.data?.message || "Could not update saved job.");
+    } finally {
+      setSaveBusy(false);
+    }
+  };
+
+  const handleTaskToggle = async (task) => {
+    const previousKeys = report.completedTaskKeys || [];
+    const key = `${task.day}:${task.taskIndex}`;
+    const nextKeys = task.completed
+      ? [...new Set([...previousKeys, key])]
+      : previousKeys.filter((item) => item !== key);
+    // Update immediately; restore the old state if the API request fails.
+    setReport((current) => ({ ...current, completedTaskKeys: nextKeys }));
+    setProgressError("");
+    try {
+      await setTaskCompleted(id, task);
+    } catch (error) {
+      setReport((current) => ({ ...current, completedTaskKeys: previousKeys }));
+      setProgressError(error.response?.data?.message || "Could not save preparation progress.");
+    }
+  };
+
   const currentQuestions =
     activeTab === "technical" ? technicalQuestions : behaviourQuestions;
 
@@ -79,8 +116,11 @@ const Interview = () => {
 
       <section className='content-section'>
         <div className='content-top'>
-          <button className='back-btn' onClick={() => navigate(-1)}>
+          <button className='back-btn' onClick={() => navigate("/reports")}>
             ← Back to All Reports
+          </button>
+          <button className="save-job-btn" disabled={saveBusy} onClick={handleSaveStatus}>
+            {saveBusy ? "Saving…" : report.isSaved ? "★ Saved job" : "☆ Save job"}
           </button>
           <button className='download-btn' onClick={downloadReport}>
             Download PDF
@@ -133,6 +173,12 @@ const Interview = () => {
             </div>
           ))}
         </div>
+        {progressError && <p role="alert" className="progress-error">{progressError}</p>}
+        <PreparationPlan
+          plan={report.preparationPlan || []}
+          completedTaskKeys={report.completedTaskKeys || []}
+          onToggleTask={handleTaskToggle}
+        />
       </section>
 
       <aside className='stats-panel'>

@@ -6,7 +6,7 @@ import Loader from "../../../components/Loader";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { loading,generateReport } = useInterview();
+  const { loading, generateReport, error, clearError } = useInterview();
   const [jobDescription, setJobDescription] = useState("");
   const [selfDescription, setSelfDescription] = useState("");
   const resumeRef = useRef(null);
@@ -16,13 +16,14 @@ const Home = () => {
       alert("Please fill in all fields and upload your resume.");
       return;
     }
+    clearError();
     const resumeFile = resumeRef.current.files[0];
     const report = await generateReport(
       resumeFile,
       jobDescription,
       selfDescription
     );
-    navigate(`/interview/${report?._id}`);
+    if (report?._id) navigate(`/interview/${report._id}`);
   };
   
   if(loading){
@@ -64,7 +65,7 @@ const Home = () => {
 
         <div className='profile-card'>
           <div className='upload-card'>
-            <input ref={resumeRef} type='file' id='resume' accept='.pdf,.doc,.docx' />
+            <input ref={resumeRef} type='file' id='resume' accept='.pdf,application/pdf' />
 
             <label htmlFor='resume'>
               <div className='upload-icon'>↑</div>
@@ -72,7 +73,7 @@ const Home = () => {
 
               <h3>Upload Resume</h3>
 
-              <p>PDF or DOCX · Max 5MB</p>
+              <p>PDF · Max 5MB</p>
             </label>
           </div>
 
@@ -91,7 +92,8 @@ const Home = () => {
           AI analysis usually takes around 20–30 seconds.
         </div>
 
-        <button className='generate-btn' onClick={handleGenerteReport}>
+        {error && <p role="alert" className="home-error">{error}</p>}
+        <button className='generate-btn' onClick={handleGenerteReport} disabled={loading}>
           Generate Interview Blueprint
         </button>
       </section>

@@ -20,7 +20,7 @@ const api = axios.create({
       return response.data;
     } catch (error) {
       console.log("Error generating interview report:", error);
-      return null;
+      throw error;
     }
   }
   
@@ -30,7 +30,7 @@ const api = axios.create({
       return response.data;
     } catch (error) {
       console.log("Error fetching interview report:", error);
-      return null;
+      throw error;
     }
   }
   
@@ -40,9 +40,23 @@ const api = axios.create({
       return response.data;
     } catch (error) {
       console.log("Error fetching all interview reports:", error);
-      return null;
+    throw error;
     }
   }
+
+export async function setInterviewSavedStatus(id, saved) {
+  const response = await api.patch(`/report/${id}/saved`, { saved });
+  return response.data;
+}
+
+export async function setPreparationTaskCompleted(id, { day, taskIndex, completed }) {
+  const response = await api.patch(`/report/${id}/preparation-progress`, {
+    day,
+    taskIndex,
+    completed,
+  });
+  return response.data;
+}
   
   export async function downloadReportPdf(id){
     try {
@@ -55,5 +69,6 @@ const api = axios.create({
      return response;
     } catch (error) {
       console.error("Error downloading interview report:", error);
+      throw error;
     }
   };

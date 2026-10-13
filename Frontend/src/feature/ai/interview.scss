@@ -1,14 +1,12 @@
 .interview-page {
+    width: min(100%, 1680px);
     min-height: 100vh;
-  
+    margin: 0 auto;
     display: grid;
-  
-    grid-template-columns:
-      260px 1fr 320px;
-  
-    gap: 2rem;
-  
-    padding: 2rem;
+    grid-template-columns: minmax(190px, 240px) minmax(0, 1fr) minmax(250px, 300px);
+    align-items: start;
+    gap: clamp(1rem, 1.6vw, 1.5rem);
+    padding: 1.5rem clamp(1rem, 2vw, 2rem) 3rem;
   
     background:
       radial-gradient(
@@ -25,11 +23,6 @@
   
     color: white;
   
-    @media (max-width: 1200px) {
-     display: flex;
-     flex-direction: column;
-     gap: 2rem;
-    }
   }
   
   .sidebar,
@@ -50,17 +43,18 @@
   
   .content-section {
     min-height: 600px; 
-    width: 100%; 
-    
-    margin: 0 auto; 
-    border-radius: 8px; 
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); // Optional: Add a subtle shadow
+    min-width: 0;
+    width: 100%;
+    margin: 0;
+    border-radius: 24px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
   }
   
   .sidebar {
     height: fit-content;
-    top: 2rem;
-    bottom: 2rem;
+    min-width: 0;
+    position: sticky;
+    top: 5.5rem;
   }
   
   .sidebar-title {
@@ -287,7 +281,7 @@
     height: fit-content;
   
     position: sticky;
-    top: 2rem;
+    top: 5.5rem;
   }
   
   .score-card,
@@ -407,6 +401,9 @@
   
   .content-top {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
     justify-content: space-between;
     margin-bottom: 1.5rem;
   }
@@ -461,5 +458,218 @@
   
     &:hover {
       transform: translateY(-2px);
+    }
+  }
+
+  .preparation-plan {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .preparation-plan-heading,
+  .comparison-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+
+    h2 {
+      margin: 0.25rem 0 0;
+      font-size: 1.5rem;
+    }
+  }
+
+  .plan-progress {
+    color: #c4b5fd;
+    font-weight: 700;
+  }
+
+  .preparation-days {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .preparation-day {
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.025);
+
+    h3 {
+      margin: 0 0 0.85rem;
+    }
+
+    ul {
+      display: grid;
+      gap: 0.7rem;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    label {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.7rem;
+      color: rgba(255, 255, 255, 0.78);
+      line-height: 1.5;
+      cursor: pointer;
+    }
+
+    input {
+      margin-top: 0.2rem;
+      accent-color: #8b5cf6;
+    }
+  }
+
+  .progress-error {
+    color: #fca5a5;
+  }
+
+  .interview-page--error {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 1200px) {
+    .interview-page {
+      grid-template-columns: minmax(180px, 220px) minmax(0, 1fr);
+      gap: 1rem;
+      padding-inline: 1.25rem;
+    }
+
+    .stats-panel {
+      position: static;
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: stretch;
+    }
+  }
+
+  @media (max-width: 760px) {
+    .interview-page {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        "sidebar"
+        "content"
+        "stats";
+      gap: 1rem;
+      padding: 1rem 0.85rem 2rem;
+    }
+
+    .sidebar,
+    .content-section,
+    .stats-panel {
+      padding: 1rem;
+      border-radius: 20px;
+    }
+
+    .sidebar {
+      grid-area: sidebar;
+      position: static;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+    .content-section { grid-area: content; min-height: 0; }
+    .stats-panel {
+      grid-area: stats;
+      position: static;
+      grid-column: auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+    }
+
+    .sidebar-title {
+      grid-column: 1 / -1;
+      margin-bottom: 0.75rem;
+      font-size: 0.75rem;
+    }
+
+    .nav-btn {
+      width: auto;
+      min-height: 48px;
+      margin: 0;
+      padding: 0.7rem;
+      border-radius: 13px;
+      font-size: 0.84rem;
+      line-height: 1.35;
+    }
+
+    .section-header {
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+
+      h1 { font-size: clamp(1.35rem, 6vw, 1.8rem); }
+    }
+
+    .question-count {
+      flex: 0 0 auto;
+      padding: 0.45rem 0.65rem;
+      font-size: 0.78rem;
+    }
+
+    .content-top {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.55rem;
+    }
+
+    .content-top button {
+      min-width: 0;
+      padding: 0.7rem 0.55rem;
+      font-size: 0.82rem;
+    }
+
+    .content-top .back-btn { grid-column: 1 / -1; justify-content: center; }
+
+    .question-header { padding: 1rem; }
+    .question-left { min-width: 0; gap: 0.7rem; }
+    .question-left h3 { min-width: 0; font-size: 0.95rem; overflow-wrap: anywhere; }
+    .question-number { min-width: 40px; height: 40px; border-radius: 12px; }
+    .question-body { padding: 0 1rem 1rem; }
+
+    .score-card,
+    .skill-gap-card {
+      min-width: 0;
+      padding: 0.85rem;
+      border-radius: 16px;
+
+      h3 { margin-bottom: 0.85rem; font-size: 0.72rem; letter-spacing: 1px; }
+    }
+
+    .score-ring {
+      width: clamp(88px, 27vw, 120px);
+      height: clamp(88px, 27vw, 120px);
+
+      &::before { width: 68%; height: 68%; }
+      span { font-size: 1.45rem; }
+    }
+
+    .score-card p { font-size: 0.78rem; line-height: 1.45; }
+    .skills-list { gap: 0.55rem; }
+    .skill-pill { padding: 0.65rem; font-size: 0.8rem; overflow-wrap: anywhere; }
+    .preparation-plan { margin-top: 2rem; padding-top: 1.5rem; }
+    .preparation-plan-heading { align-items: flex-start; flex-direction: column; }
+    .preparation-plan-heading h2 { font-size: 1.25rem; }
+    .preparation-day { padding: 1rem; }
+  }
+
+  @media (max-width: 380px) {
+    .stats-panel { grid-template-columns: minmax(0, 1fr); }
+    .score-ring { width: 120px; height: 120px; }
+    .content-top { grid-template-columns: minmax(0, 1fr); }
+    .content-top .back-btn { grid-column: auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .interview-page *,
+    .interview-page *::before,
+    .interview-page *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
     }
   }
