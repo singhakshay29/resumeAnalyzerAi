@@ -2,16 +2,13 @@ require("dotenv").config();
 
 const app = require("./src/app");
 const connectToDB = require("./src/config/database");
-
-let connectionPromise;
+const { log } = require("./src/utils/logger");
 
 module.exports = async function handler(req, res) {
   try {
-    connectionPromise ??= connectToDB();
-    await connectionPromise;
+    await connectToDB();
   } catch (error) {
-    connectionPromise = undefined;
-    console.error("Database connection failed:", error);
+    log("error", "database_connection_failed", { requestId: req.id, error: error.message });
     return res.status(503).json({ message: "Database unavailable" });
   }
 

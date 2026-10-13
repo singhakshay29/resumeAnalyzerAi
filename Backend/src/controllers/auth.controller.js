@@ -2,6 +2,7 @@ const userModal = require("../models/user.model");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const tokenblacklistModal = require("../models/blacklist.model");
+const { log } = require("../utils/logger");
 async function registerUserController(req, res) {
   try {
     const { userName, email, password } = req.body;
@@ -45,7 +46,7 @@ async function registerUserController(req, res) {
       },
     });
   } catch (error) {
-    console.error("registerUserController error:", error);
+    log("error", "registration_failed", { requestId: req.id, error: error.message });
     return res.status(500).json({
       success: false,
       message: "Unable to create account. Please try again later.",
@@ -100,7 +101,7 @@ async function loginUserController(req, res) {
       },
     });
   } catch (error) {
-    console.error("loginUserController error:", error);
+    log("error", "login_failed", { requestId: req.id, error: error.message });
     return res.status(500).json({
       success: false,
       message: "Unable to login. Please try again later.",
@@ -119,7 +120,7 @@ async function logoutUserController(req, res) {
       message: "User Logged out Successfully",
     });
   } catch (error) {
-    console.error("logoutUserController error:", error);
+    log("error", "logout_failed", { requestId: req.id, error: error.message });
     return res.status(500).json({ message: "Internal server error" });
   }
 }
@@ -136,7 +137,7 @@ async function getUserInfoController(req, res) {
       },
     });
   } catch (error) {
-    console.error("getUserInfoController error:", error);
+    log("error", "user_info_fetch_failed", { requestId: req.id, error: error.message });
     return res.status(500).json({ message: "Internal server error" });
   }
  

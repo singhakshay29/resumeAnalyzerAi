@@ -12,5 +12,7 @@ interviewRouter.get('/report/:id',authMiddleware.authUser, interviewController.g
 interviewRouter.get('/all_reports',authMiddleware.authUser, interviewController.getAllInterviewReportsByUser)
 
 interviewRouter.get('/report/:id/download',authMiddleware.authUser, interviewController.downloadReport)
+interviewRouter.patch('/report/:id/saved',authMiddleware.authUser, interviewController.updateSavedStatus)
+interviewRouter.patch('/report/:id/preparation-progress',authMiddleware.authUser, interviewController.updatePreparationProgress)
 
 module.exports=interviewRouter;

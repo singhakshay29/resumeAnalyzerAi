@@ -52,6 +52,8 @@ const interviewSchema = new mongoose.Schema(
     behaviourQuestions: [behaviourQuestionsSchema],
     skillGaps: [skillgapSchema],
     preparationPlan: [preparationPlanSchema],
+    completedTaskKeys: { type: [String], default: [] },
+    isSaved: { type: Boolean, default: false },
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",

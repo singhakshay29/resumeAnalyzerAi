@@ -1,6 +1,7 @@
 const { GoogleGenAI } = require("@google/genai");
 const { z } = require("zod");
 const { zodToJsonSchema } = require("zod-to-json-schema");
+const { log } = require("../utils/logger");
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
@@ -150,17 +151,19 @@ async function generateInterviewReport({
         task: Array.isArray(item.task) ? item.task : [item.task],
       }));
 
-      console.log("Parsed technicalQuestions:", parsed.technicalQuestions);
-  
       const validated = interviewReportSchema.parse(parsed);
       
       return validated;
     } catch (error) {
-      console.error(`Attempt ${attempt} failed:`, error.message);
+      log("warn", "ai_report_attempt_failed", {
+        attempt,
+        statusCode: error.status,
+        error: error.message,
+      });
   
       if (attempt < maxRetries && (error.status === 503 || error.status === 429)) {
         const delay = 2000 * attempt;
-        console.log(`Retrying in ${delay}ms...`);
+        log("info", "ai_report_retry_scheduled", { attempt, delayMs: delay });
         await new Promise((res) => setTimeout(res, delay));
         continue;
       }
