@@ -10,6 +10,7 @@ const Home = () => {
   const [jobDescription, setJobDescription] = useState("");
   const [selfDescription, setSelfDescription] = useState("");
   const resumeRef = useRef(null);
+  const idempotencyRef = useRef(null);
 
   const handleGenerteReport = async () => {
     if(jobDescription.trim() === "" || selfDescription.trim() === "" || !resumeRef.current.files[0]){
@@ -18,12 +19,26 @@ const Home = () => {
     }
     clearError();
     const resumeFile = resumeRef.current.files[0];
-    const report = await generateReport(
+    const requestSignature = JSON.stringify([
+      jobDescription,
+      selfDescription,
+      resumeFile.name,
+      resumeFile.size,
+      resumeFile.lastModified,
+    ]);
+    if (idempotencyRef.current?.signature !== requestSignature) {
+      idempotencyRef.current = { signature: requestSignature, key: window.crypto.randomUUID() };
+    }
+    const job = await generateReport(
       resumeFile,
       jobDescription,
-      selfDescription
+      selfDescription,
+      idempotencyRef.current.key,
     );
-    if (report?._id) navigate(`/interview/${report._id}`);
+    if (job?.jobId) {
+      idempotencyRef.current = null;
+      navigate(`/interview/${job.jobId}`);
+    }
   };
   
   if(loading){

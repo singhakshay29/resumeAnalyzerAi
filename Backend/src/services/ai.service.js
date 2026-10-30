@@ -5,6 +5,8 @@ const { log } = require("../utils/logger");
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GOOGLE_API_KEY,
+  timeout: Number(process.env.AI_REQUEST_TIMEOUT_MS || 60000),
+  maxRetries: 0,
 });
 
 const chunkIntoObjects = (arr, keys) => {
@@ -62,9 +64,7 @@ async function generateInterviewReport({
   selfDescription,
   jobDescription,
 }) {
-  const maxRetries = 3;
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
+  try {
       const prompt = `
       Generate an interview report for the candidate.
       
@@ -154,23 +154,12 @@ async function generateInterviewReport({
       const validated = interviewReportSchema.parse(parsed);
       
       return validated;
-    } catch (error) {
-      log("warn", "ai_report_attempt_failed", {
-        attempt,
-        statusCode: error.status,
-        error: error.message,
-      });
-  
-      if (attempt < maxRetries && (error.status === 503 || error.status === 429)) {
-        const delay = 2000 * attempt;
-        log("info", "ai_report_retry_scheduled", { attempt, delayMs: delay });
-        await new Promise((res) => setTimeout(res, delay));
-        continue;
-      }
-  
-      throw error;
-    }
-    
+  } catch (error) {
+    log("warn", "ai_report_generation_failed", {
+      statusCode: error.status,
+      error: error.message,
+    });
+    throw error;
   }
 }
 

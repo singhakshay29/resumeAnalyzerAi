@@ -1,9 +1,9 @@
-const pdfParse=require('pdf-parse');
 const mongoose = require("mongoose");
-const {generateInterviewReport} = require('../services/ai.service');
+const { createHash } = require("crypto");
 const interviewReportModal = require('../models/interview.modal');
 const generateInterviewPdf = require('../utils/generate');
 const { log } = require('../utils/logger');
+const { enqueueReportGeneration } = require("../queues/report.queue");
 
 async function generateInterviewReportController(req,res){ 
     try {
@@ -14,28 +14,78 @@ async function generateInterviewReportController(req,res){
               message: "selfDescription and jobDescription are required",
             });
           }
-          let resumeText = "";
-          if (req.file) {
-            const resumeContent = await pdfParse(req.file.buffer);
-            resumeText = resumeContent.text;
-          }    
-        
-        
-        const interviewReportByAi =await generateInterviewReport({
-            resume:resumeText,
-            selfDescription,
-            jobDescription
-        })
-        
-        const interviewReport = await interviewReportModal.create({
+        const idempotencyKey = req.get("Idempotency-Key");
+        if (!idempotencyKey || idempotencyKey.length > 128 || !/^[\w.:/-]+$/.test(idempotencyKey)) {
+          return res.status(400).json({ success: false, message: "Idempotency-Key must be 1–128 letters, numbers, or . _ : / - characters" });
+        }
+        const requestFingerprint = createHash("sha256").update(JSON.stringify({
+          selfDescription,
+          jobDescription,
+          resumeDigest: req.file ? createHash("sha256").update(req.file.buffer).digest("hex") : null,
+        })).digest("hex");
+
+        const sendExistingJob = (existingReport) => {
+          if (existingReport.requestFingerprint !== requestFingerprint) {
+            return res.status(409).json({ success: false, message: "This Idempotency-Key was already used with different report inputs" });
+          }
+          return res.status(202).json({
+            success: true,
+            jobId: String(existingReport.id),
+            data: existingReport,
+          });
+        };
+
+        const existingReport = await interviewReportModal.findOne({ user: req.user.id, idempotencyKey });
+        if (existingReport) return sendExistingJob(existingReport);
+
+        const interviewReport = new interviewReportModal({
             user:req.user.id,
-            resumeText:  resumeText,
             selfDescription,
             jobDescription,
-            ...interviewReportByAi
-        })
-        res.status(200).json({
+            title: "Interview report in progress",
+            status: "queued",
+            idempotencyKey,
+            requestFingerprint,
+            resumeMetadata: req.file ? {
+              originalName: req.file.originalname,
+              mimeType: req.file.mimetype,
+              sizeBytes: req.file.size,
+            } : undefined,
+        });
+        interviewReport.queueJobId = String(interviewReport.id);
+        try {
+          await interviewReport.save();
+        } catch (saveError) {
+          if (saveError.code !== 11000) throw saveError;
+          const duplicateReport = await interviewReportModal.findOne({ user: req.user.id, idempotencyKey });
+          if (duplicateReport) return sendExistingJob(duplicateReport);
+          throw saveError;
+        }
+
+        try {
+          await enqueueReportGeneration({
+            reportId: interviewReport.id,
+            userId: req.user.id,
+            resumeFile: req.file,
+            selfDescription,
+            jobDescription,
+            requestId: req.id,
+          });
+        } catch (queueError) {
+          await interviewReportModal.updateOne({ _id: interviewReport._id }, {
+            $set: {
+              status: "failed",
+              title: "Interview report failed",
+              processingError: "Report processing could not be started",
+              processingFailureCode: "QUEUE_ENQUEUE_FAILED",
+            },
+          });
+          throw queueError;
+        }
+
+        return res.status(202).json({
             success:true,
+            jobId: String(interviewReport.id),
             data:interviewReport
         })
     } catch (error) {
@@ -43,9 +93,9 @@ async function generateInterviewReportController(req,res){
             requestId: req.id,
             error: error.message,
         });
-        res.status(500).json({
+        return res.status(503).json({
             success:false,
-            message:"Failed to generate interview report"
+            message:"Report processing is temporarily unavailable"
         })
     }
    
@@ -64,6 +114,13 @@ async function getInterviewReportById(req,res){
                 success:false,
                 message:"Interview report not found"
             })
+        }
+        if (interviewReport.status === "failed") {
+            return res.status(422).json({
+                success: false,
+                message: interviewReport.processingError || "Interview report processing failed",
+                data: interviewReport,
+            });
         }
         res.status(200).json({
             success:true,

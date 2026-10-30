@@ -54,6 +54,25 @@ const interviewSchema = new mongoose.Schema(
     preparationPlan: [preparationPlanSchema],
     completedTaskKeys: { type: [String], default: [] },
     isSaved: { type: Boolean, default: false },
+    status: {
+      type: String,
+      enum: ["queued", "processing", "completed", "failed"],
+      default: "completed",
+      index: true,
+    },
+    queueJobId: String,
+    retryCount: { type: Number, default: 0 },
+    idempotencyKey: String,
+    requestFingerprint: String,
+    resumeMetadata: {
+      originalName: String,
+      mimeType: String,
+      sizeBytes: Number,
+    },
+    processingError: String,
+    processingFailureCode: String,
+    processingStartedAt: Date,
+    processingCompletedAt: Date,
     user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "users",
@@ -62,6 +81,11 @@ const interviewSchema = new mongoose.Schema(
     title: { type: String, required: [true, "Title is required"] },
   },
   { timestamps: true }
+);
+
+interviewSchema.index(
+  { user: 1, idempotencyKey: 1 },
+  { unique: true, partialFilterExpression: { idempotencyKey: { $type: "string" } } },
 );
 
 const interviewReportModal = mongoose.model("InterviewReport", interviewSchema);

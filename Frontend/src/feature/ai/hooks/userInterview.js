@@ -18,6 +18,7 @@ export const useInterview = () => {
     resumeFile,
     selfDescription,
     jobDescription,
+    idempotencyKey,
   ) => {
     setError("");
     setLoading(true);
@@ -26,9 +27,10 @@ export const useInterview = () => {
         resumeFile,
         selfDescription,
         jobDescription,
+        idempotencyKey,
       });
-       setReport(response?.data);
-      return response?.data;
+      setReport(response?.data);
+      return { jobId: response?.jobId, report: response?.data };
     } catch (error) {
       console.log("Error generating interview report:", error);
       setError(error.response?.data?.message || "Could not generate the report. Please try again.");
@@ -49,6 +51,7 @@ export const useInterview = () => {
     } catch (error) {
       console.log("Error fetching interview report:", error);
       setError(error.response?.data?.message || "Could not load this report.");
+      setReport(null);
       return response;
     } finally {
       setLoading(false);

@@ -5,6 +5,7 @@ const path = require("path");
 const authRoute = require("./routes/auth.route");
 const interviewRoute = require("./routes/ai.route");
 const healthRoute = require("./routes/health.route");
+const jobRoute = require("./routes/job.route");
 const { log } = require("./utils/logger");
 const { randomUUID } = require("crypto");
 const { rateLimit } = require("express-rate-limit");
@@ -59,6 +60,7 @@ app.use((req, res, next) => {
 
 
 app.use("/api/health", healthRoute);
+app.use("/api/jobs", jobRoute);
 app.use("/api/auth", authLimiter);
 app.use("/api/interview", (req, res, next) => {
   if (req.method === "POST" && req.path === "/") return reportGenerationLimiter(req, res, next);

@@ -131,9 +131,10 @@ const Reports = () => {
                 <p className='report-date'>
                   {new Date(report.createdAt).toLocaleDateString()}
                 </p>
+                {report.status && report.status !== "completed" && <p className="report-date">Status: {report.status}</p>}
               </div>
 
-              <div
+              {report.status === "completed" ? <div
                 className={`score-badge ${
                   report.matchScore >= 80
                     ? "excellent"
@@ -142,7 +143,7 @@ const Reports = () => {
                     : "average"
                 }`}>
                 {report.matchScore}%
-              </div>
+              </div> : <div className="score-badge average">—</div>}
             </div>
 
             <div className='report-stats'>
@@ -167,7 +168,7 @@ const Reports = () => {
                 <button
                   type="button"
                   className="save-job-btn"
-                  disabled={savingIds.includes(report._id)}
+                  disabled={savingIds.includes(report._id) || report.status !== "completed"}
                   onClick={() => toggleSaved(report)}
                 >
                   {savingIds.includes(report._id) ? "Saving…" : report.isSaved ? "★ Saved job" : "☆ Save job"}
@@ -176,7 +177,7 @@ const Reports = () => {
                   <input
                     type="checkbox"
                     checked={selectedIds.includes(report._id)}
-                    disabled={selectedIds.length >= 3 && !selectedIds.includes(report._id)}
+                    disabled={report.status !== "completed" || (selectedIds.length >= 3 && !selectedIds.includes(report._id))}
                     onChange={() => toggleCompare(report._id)}
                   />
                   Compare

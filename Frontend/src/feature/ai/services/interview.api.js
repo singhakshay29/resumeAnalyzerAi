@@ -5,7 +5,7 @@ const api = axios.create({
     withCredentials: true,
   });
   
-  export async function generateInterviewReport({ resumeFile, selfDescription, jobDescription }) {
+  export async function generateInterviewReport({ resumeFile, selfDescription, jobDescription, idempotencyKey }) {
     const formData = new FormData();
     formData.append("resume", resumeFile);
     formData.append("selfDescription", selfDescription);
@@ -15,6 +15,7 @@ const api = axios.create({
       const response = await api.post("/", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          "Idempotency-Key": idempotencyKey,
         },
       });
       return response.data;
@@ -46,6 +47,16 @@ const api = axios.create({
 
 export async function setInterviewSavedStatus(id, saved) {
   const response = await api.patch(`/report/${id}/saved`, { saved });
+  return response.data;
+}
+
+export async function getInterviewJobStatus(jobId) {
+  const response = await axios.get(`/api/jobs/${jobId}`, { withCredentials: true });
+  return response.data;
+}
+
+export async function retryInterviewJob(jobId) {
+  const response = await axios.post(`/api/jobs/${jobId}/retry`, {}, { withCredentials: true });
   return response.data;
 }
 

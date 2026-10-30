@@ -3,7 +3,7 @@ import "../interview.scss";
 import { useNavigate, useParams } from "react-router";
 
 import { useEffect, useState } from "react";
-import {downloadReportPdf} from "../services/interview.api";
+import {downloadReportPdf, getInterviewJobStatus, retryInterviewJob} from "../services/interview.api";
 import Loader from "../../../components/Loader";
 import PreparationPlan from "../components/PreparationPlan";
 
@@ -14,21 +14,82 @@ const Interview = () => {
   const { report, error, genrateReportById, loading, setSavedStatus, setTaskCompleted, setReport } = useInterview();
   const [saveBusy, setSaveBusy] = useState(false);
   const [progressError, setProgressError] = useState("");
+  const [jobStatus, setJobStatus] = useState(null);
+  const [jobError, setJobError] = useState("");
+  const [retrying, setRetrying] = useState(false);
+  const [pollVersion, setPollVersion] = useState(0);
   const { id } = useParams();
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (id) {
-      genrateReportById(id);
+    if (!id) return undefined;
+    let cancelled = false;
+    let timer;
+    setJobStatus(null);
+    setJobError("");
+    setReport(null);
+    const pollJob = async () => {
+      try {
+        const response = await getInterviewJobStatus(id);
+        const currentStatus = response?.data;
+        if (cancelled) return;
+        setJobStatus(currentStatus);
+        if (["queued", "processing"].includes(currentStatus?.status)) {
+          timer = window.setTimeout(pollJob, 2000);
+        } else if (currentStatus?.status === "completed") {
+          await genrateReportById(id);
+        } else if (currentStatus?.status === "failed") {
+          setJobError(currentStatus.error || "Report generation failed.");
+        }
+      } catch (pollError) {
+        if (!cancelled) {
+          setJobError(pollError.response?.data?.message || "Could not check report status.");
+          setJobStatus({ status: "unavailable" });
+        }
+      }
+    };
+    pollJob();
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [id, genrateReportById, pollVersion, setReport]);
+
+  const handleRetry = async () => {
+    setRetrying(true);
+    setJobError("");
+    try {
+      await retryInterviewJob(id);
+      setJobStatus((current) => ({ ...current, status: "queued" }));
+      setPollVersion((current) => current + 1);
+    } catch (retryError) {
+      setJobError(retryError.response?.data?.message || "Could not retry this report.");
+    } finally {
+      setRetrying(false);
     }
-  }, [id, genrateReportById]);
+  };
 
   if (error && !loading && !report) {
     return <main className="interview-page interview-page--error"><section className="content-section"><p role="alert">{error}</p><button className="back-btn" onClick={() => navigate("/reports")}>Back to reports</button></section></main>;
   }
 
-  if (loading || !report) {
+  if (jobStatus?.status === "unavailable") {
+    return <main className="interview-page interview-page--error"><section className="content-section">
+      <p role="alert">{jobError}</p>
+      <button className="back-btn" onClick={() => navigate("/reports")}>Back to reports</button>
+    </section></main>;
+  }
+
+  if (jobStatus?.status === "failed") {
+    return <main className="interview-page interview-page--error"><section className="content-section">
+      <p role="alert">{jobError || "Report generation failed."}</p>
+      <button className="back-btn" disabled={retrying} onClick={handleRetry}>{retrying ? "Retrying…" : "Retry report"}</button>
+      <button className="back-btn" onClick={() => navigate("/reports")}>Back to reports</button>
+    </section></main>;
+  }
+
+  if (loading || !jobStatus || jobStatus.status === "queued" || jobStatus.status === "processing" || !report) {
     return  <Loader
-    title="Preparing Your Interview Blueprint"
+    title={jobStatus?.status === "queued" ? "Your Report Is Queued" : "Preparing Your Interview Blueprint"}
     message="Analyzing your resume, matching skills, and generating personalized interview questions."
   />;
   }
@@ -119,6 +180,7 @@ const Interview = () => {
           <button className='back-btn' onClick={() => navigate("/reports")}>
             ← Back to All Reports
           </button>
+          <span className="report-status" role="status">Report completed</span>
           <button className="save-job-btn" disabled={saveBusy} onClick={handleSaveStatus}>
             {saveBusy ? "Saving…" : report.isSaved ? "★ Saved job" : "☆ Save job"}
           </button>
